@@ -1,15 +1,25 @@
 function calculateMinCost() {
-  
-	let arr = form.children[1].value.trim().split(',');
-	arr = arr.map((e) => Number(e.trim()));
-	let ans = 0;
-	while(arr.length>1){
-		arr.sort((a, b) => a-b);
-		let add = (arr.shift() + arr.shift());
-		arr.unshift(add);
-		ans+=add;
-	}
-	result.innerText = ans;
-} 
-  
-}  
+    return new Promise(resolve => {
+        const inputText = document.getElementById("rope-lengths").value;
+        const ropeLengths = inputText.split(',').map(Number);
+
+        const minHeap = new MinHeap();
+
+        ropeLengths.forEach(length => minHeap.insert(length));
+
+        let totalCost = 0;
+
+        while (minHeap.size() > 1) {
+            const rope1 = minHeap.extractMin();
+            const rope2 = minHeap.extractMin();
+
+            const cost = rope1 + rope2;
+            totalCost += cost;
+
+            minHeap.insert(cost);
+        }
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerText = `Minimum Cost: ${totalCost}`;
+        resolve(totalCost);
+    });
+}
