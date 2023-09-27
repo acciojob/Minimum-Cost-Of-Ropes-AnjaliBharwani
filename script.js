@@ -1,34 +1,62 @@
+function minHeapify(arr, i, heapSize) {
+    const left = 2 * i + 1;
+    const right = 2 * i + 2;
+    let smallest = i;
 
-function findMinCost(arr) {
-    if (arr.length === 0) {
-        return 0;
+    if (left < heapSize && arr[left] < arr[i]) {
+        smallest = left;
     }
 
-    arr.sort((a, b) => a - b);
-
-    let minCost = 0;
-    let first = arr[0];
-    let second = arr[1];
-
-    for (let i = 2; i < arr.length; i++) {
-        minCost += first + second;
-        first = second;
-        second = arr[i];
+    if (right < heapSize && arr[right] < arr[smallest]) {
+        smallest = right;
     }
 
-    minCost += first + second;
-
-    return minCost;
+    if (smallest !== i) {
+        [arr[i], arr[smallest]] = [arr[smallest], arr[i]];
+        minHeapify(arr, smallest, heapSize);
+    }
 }
 
-function main() {
-    const input = document.getElementById("input").value;
-    const arr = input.split(",").map(Number);
-    const result = findMinCost(arr);
-    document.getElementById("result").innerText = result;
+function buildMinHeap(arr) {
+    const n = arr.length;
+    for (let i = Math.floor(n / 2); i >= 0; i--) {
+        minHeapify(arr, i, n);
+    }
 }
 
-document.getElementById("form").addEventListener("submit", (event) => {
-    event.preventDefault();
-    main();
-});
+function extractMin(arr, heapSize) {
+    if (heapSize <= 0) return -1;
+    if (heapSize === 1) {
+        heapSize--;
+        return arr.pop();
+    }
+
+    const root = arr[0];
+    arr[0] = arr[heapSize - 1];
+    heapSize--;
+    minHeapify(arr, 0, heapSize);
+
+    return root;
+}
+
+function calculateMinimumCost() {
+    const inputElement = document.getElementById("inputRopes");
+    const resultElement = document.getElementById("result");
+    const ropeLengths = inputElement.value.split(",").map(Number);
+
+    const heapSize = ropeLengths.length;
+    buildMinHeap(ropeLengths);
+
+    let totalCost = 0;
+
+    while (heapSize > 1) {
+        const min1 = extractMin(ropeLengths, heapSize);
+        const min2 = extractMin(ropeLengths, heapSize);
+        const newRope = min1 + min2;
+        totalCost += newRope;
+        ropeLengths.push(newRope);
+        heapSize++;
+    }
+
+    resultElement.textContent = `Minimum Cost: ${totalCost}`;
+}
